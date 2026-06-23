@@ -1,30 +1,46 @@
 const express = require("express");
 const Todo = require("../models/Todo");
-
-const router = express.Router();
 const History = require("../models/History");
 
+const router = express.Router();
 
+/* ---------------- GET TODOS (USER ONLY) ---------------- */
 router.get("/", async (req, res) => {
-  const todos = await Todo.find();
-  res.json(todos);
+  try {
+    const { userId } = req.query;
+
+    const todos = await Todo.find({ userId });
+
+    res.json(todos);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server Error" });
+  }
 });
 
+/* ---------------- CREATE TODO (WITH USER) ---------------- */
 router.post("/", async (req, res) => {
-  const { name, dueDate } = req.body;
+  try {
+    const { name, dueDate, userId } = req.body;
 
-  const todo = new Todo({
-    name,
-    dueDate,
-  });
+    const todo = new Todo({
+      name,
+      dueDate,
+      userId,
+    });
 
-  await todo.save();
+    await todo.save();
 
-  res.json({
-    message: "Todo Added",
-  });
+    res.json({
+      message: "Todo Added",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server Error" });
+  }
 });
 
+/* ---------------- DELETE TODO + MOVE TO HISTORY ---------------- */
 router.delete("/:id", async (req, res) => {
   try {
     const todo = await Todo.findById(req.params.id);
@@ -35,9 +51,11 @@ router.delete("/:id", async (req, res) => {
       });
     }
 
+    // move to history WITH userId
     await History.create({
       name: todo.name,
       dueDate: todo.dueDate,
+      userId: todo.userId,
     });
 
     await Todo.findByIdAndDelete(req.params.id);
@@ -47,23 +65,21 @@ router.delete("/:id", async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-
-    res.status(500).json({
-      message: "Server Error",
-    });
+    res.status(500).json({ message: "Server Error" });
   }
 });
+
+/* ---------------- GET HISTORY (USER ONLY) ---------------- */
 router.get("/history", async (req, res) => {
   try {
-    const history = await History.find();
+    const { userId } = req.query;
+
+    const history = await History.find({ userId });
 
     res.json(history);
   } catch (error) {
     console.log(error);
-
-    res.status(500).json({
-      message: "Server Error",
-    });
+    res.status(500).json({ message: "Server Error" });
   }
 });
 
