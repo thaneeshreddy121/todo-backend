@@ -83,4 +83,26 @@ router.get("/history", async (req, res) => {
   }
 });
 
+router.put("/:id", async (req, res) => {
+  try {
+    const { name, dueDate } = req.body;
+
+    const updatedTodo = await Todo.findByIdAndUpdate(
+      req.params.id,
+      {
+        name,
+        dueDate,
+      },
+      { new: true }
+    );
+
+    res.json(updatedTodo);
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      message: "Server Error",
+    });
+  }
+});
 module.exports = router;
