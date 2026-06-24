@@ -14,6 +14,18 @@ router.post("/signup", async (req, res) => {
       securityAnswer,
     } = req.body;
 
+if (
+  !name?.trim() ||
+  !email?.trim() ||
+  !password?.trim() ||
+  !securityQuestion?.trim() ||
+  !securityAnswer?.trim()
+) {
+  return res.status(400).json({
+    message: "All fields are required",
+  });
+}
+
     // Check existing user
     const existingUser = await User.findOne({
       email,
