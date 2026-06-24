@@ -5,9 +5,13 @@ const userSchema = new mongoose.Schema({
   email: String,
   password: String,
 
-  // for forgot password feature
   securityQuestion: String,
   securityAnswer: String,
+
+  address: {
+    type: String,
+    default: "Not Added",
+  },
 });
 
 module.exports = mongoose.model("User", userSchema);

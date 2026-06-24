@@ -135,4 +135,35 @@ router.post("/reset-password", async (req, res) => {
   }
 });
 
+
+/* ---------------- UPDATE PROFILE ---------------- */
+router.put("/update-profile/:id", async (req, res) => {
+  try {
+    const { name, address } = req.body;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id,
+      {
+        name,
+        address,
+      },
+      { new: true }
+    );
+
+    res.json({
+      message: "Profile Updated",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      message: "Server Error",
+    });
+  }
+});
+
+
+
+
 module.exports = router;
